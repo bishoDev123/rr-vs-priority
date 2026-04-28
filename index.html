@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>RR vs priority Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1>CPU Scheduling Comparison</h1>
+
+    <section id="input-panel">
+        <h2>Input Panel</h2>
+        <div id="process-container"></div>
+
+        <input id="" type="" placeholder="">
+
+        <button id="add-process-btn">Add Process</button>
+        <button id="run-btn">Run</button>
+    </section>
+
+    <section>
+        <h2>Round Robin</h2>
+        <div id="rr-ready-queue"></div>
+        <div id="rr-gantt"></div>
+        <table id="rr-results"></table>
+    </section>
+
+    <section>
+        <h2>priority</h2>
+        <div id="priority"></div>
+        <table id="priority-results"></table>
+    </section>
+
+    <section>
+        <h2>Comparison</h2>
+        <div id="comparison-summary"></div>
+        <div id="final-conclusion"></div>
+    </section>
+
+    <script src="js/shared/models.js"></script>
+
+    <script src="js/rr/rr.js"></script>
+ 
+
+    <script src="js/priority/priority.js"></script>
+
+
+    <script src="js/metrics/metrics.js"></script>
+
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
