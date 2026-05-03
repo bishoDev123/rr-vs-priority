@@ -1,0 +1,30 @@
+body {
+    font-family: Arial;
+    padding: 20px;
+}
+
+.gantt-container {
+    margin-top: 30px;
+}
+
+.gantt-bar {
+    display: flex;
+    border: 2px solid black;
+}
+
+.segment {
+    border-right: 2px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.timeline {
+    display: flex;
+}
+
+.tick {
+    text-align: left;
+    font-size: 14px;
+}
