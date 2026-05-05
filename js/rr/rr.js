@@ -1,7 +1,59 @@
-import ExecutionTrace from "../shared/models"
+import ExecutionTrace from "../shared/models.js";
 
-// input: processes (they will have an id and priority, you should ignore the priority), quantum time
-function roundRobin(processes, quantum) {
-    return new ExecutionTrace(1, 0, 4)
+export function roundRobin(processes, timeQuantum) {
+    
+  const queue = processes.map((p) => ({
+    id: p.id,
+    arrivalTime: p.arrivalTime,
+    burstTime: p.burstTime,
+    remainingTime: p.burstTime,
+  }));
+
+  const executionTrace = [];
+  let currentTime = 0;
+  let readyQueue = [];
+  let arrived = new Set();
+
+  queue.sort((a, b) => a.arrivalTime - b.arrivalTime);
+
+  for (const p of queue) {
+    if (p.arrivalTime <= currentTime) {
+      readyQueue.push(p);
+      arrived.add(p.id);
+    }
+  }
+
+  while (readyQueue.length > 0 || queue.some((p) => !arrived.has(p.id))) {
+    if (readyQueue.length === 0) {
+      const next = queue.find((p) => !arrived.has(p.id));
+      currentTime = next.arrivalTime;
+      for (const p of queue) {
+        if (!arrived.has(p.id) && p.arrivalTime <= currentTime) {
+          readyQueue.push(p);
+          arrived.add(p.id);
+        }
+      }
+    }
+
+    const current = readyQueue.shift();
+    const start = currentTime;
+    const runTime = Math.min(timeQuantum, current.remainingTime);
+    current.remainingTime -= runTime;
+    currentTime += runTime;
+
+    executionTrace.push(new ExecutionTrace(current.id, start, currentTime));
+
+    for (const p of queue) {
+      if (!arrived.has(p.id) && p.arrivalTime <= currentTime) {
+        readyQueue.push(p);
+        arrived.add(p.id);
+      }
+    }
+
+    if (current.remainingTime > 0) {
+      readyQueue.push(current);
+    }
+  }
+
+  return executionTrace;
 }
-// output: Execution trace with id, start time, and finish time
