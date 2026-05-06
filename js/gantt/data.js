@@ -9,7 +9,7 @@ const traces = [
     new ExecutionTrace("P1", 14, 18),
     new ExecutionTrace("P1", 18, 22),
     new ExecutionTrace("P1", 22, 26),
-    new ExecutionTrace("P1", 26, 40)
+    new ExecutionTrace("P1", 26, 100)
 ];
 
 export default traces;
