@@ -1,57 +1,311 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RR vs priority Simulator</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU Scheduling Simulator</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; line-height: 1.6; background-color: #f4f4f9; }
+        #input-panel { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .controls { margin-bottom: 15px; }
+        input { padding: 8px; margin-right: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 15px; cursor: pointer; border-radius: 4px; border: none; background: #ddd; }
+        button.primary { background: #007bff; color: white; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; background: white;}
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        .gantt-container { margin: 20px 0; overflow-x: auto; background: white; padding: 15px; border-radius: 5px; }
+        .gantt-bar { display: flex; border: 2px solid #333; height: 40px; width: max-content; }
+        .segment { border-right: 1px solid white; background-color: #4a90e2; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; box-sizing: border-box; }
+        .timeline { display: flex; width: max-content; }
+        .tick { text-align: left; font-size: 12px; color: #666; padding-top: 5px; box-sizing: border-box; }
+    </style>
 </head>
-
 <body>
 
     <h1>CPU Scheduling Comparison</h1>
 
     <section id="input-panel">
         <h2>Input Panel</h2>
-        <div id="process-container"></div>
+        
+        <div class="controls">
+            <label for="time-quantum"><strong>Time Quantum (RR): </strong></label>
+            <input id="time-quantum" type="number" min="1" value="2">
+        </div>
 
-        <input id="" type="" placeholder="">
+        <div class="controls">
+            <input id="process-id" type="text" placeholder="ID (e.g., P1)">
+            <input id="arrival-time" type="number" min="0" placeholder="Arrival Time">
+            <input id="burst-time" type="number" min="1" placeholder="Burst Time">
+            <input id="priority-val" type="number" min="1" placeholder="Priority">
+            <button id="add-process-btn" class="primary">Add Process</button>
+        </div>
 
-        <button id="add-process-btn">Add Process</button>
-        <button id="run-btn">Run</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Process ID</th>
+                    <th>Arrival Time</th>
+                    <th>Burst Time</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody id="process-container">
+            </tbody>
+        </table>
+
+        <div class="controls">
+            <button id="run-btn" class="primary" style="background: #28a745; width: 100%;">Run Simulation</button>
+        </div>
     </section>
 
     <section>
-        <h2>Round Robin</h2>
-        <div id="rr-ready-queue"></div>
-        <div id="rr-gantt"></div>
-        <table id="rr-results"></table>
+        <h2>Round Robin Results</h2>
+        <div id="rr-gantt" class="gantt-container"></div>
+        <table id="rr-results">
+            <thead>
+                <tr>
+                    <th>Avg Turnaround Time</th>
+                    <th>Avg Waiting Time</th>
+                    <th>Avg Response Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="rr-metrics-row"><td>-</td><td>-</td><td>-</td></tr>
+            </tbody>
+        </table>
     </section>
 
     <section>
-        <h2>priority</h2>
-        <div id="priority"></div>
-        <table id="priority-results"></table>
+        <h2>Priority Results</h2>
+        <div id="priority-gantt" class="gantt-container"></div>
+        <table id="priority-results">
+            <thead>
+                <tr>
+                    <th>Avg Turnaround Time</th>
+                    <th>Avg Waiting Time</th>
+                    <th>Avg Response Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="prio-metrics-row"><td>-</td><td>-</td><td>-</td></tr>
+            </tbody>
+        </table>
     </section>
 
-    <section>
-        <h2>Comparison</h2>
-        <div id="comparison-summary"></div>
-        <div id="final-conclusion"></div>
-    </section>
+    <script>
+        // --- 1. Models ---
+        class ExecutionTrace {
+            constructor(processId, start, finish) {
+                this.processId = processId;
+                this.start = start;
+                this.finish = finish;
+            }
+        }
 
-    <script src="js/shared/models.js"></script>
+        // --- 2. Round Robin Logic ---
+        function roundRobin(processes, timeQuantum) {
+            const queue = processes.map(p => ({ ...p, remainingTime: p.burstTime }));
+            const executionTrace = [];
+            let currentTime = 0;
+            let readyQueue = [];
+            let arrived = new Set();
 
-    <script src="js/rr/rr.js"></script>
- 
+            queue.sort((a, b) => a.arrivalTime - b.arrivalTime);
 
-    <script src="js/priority/priority.js"></script>
+            for (const p of queue) {
+                if (p.arrivalTime <= currentTime) {
+                    readyQueue.push(p);
+                    arrived.add(p.id);
+                }
+            }
 
+            while (readyQueue.length > 0 || queue.some(p => !arrived.has(p.id))) {
+                if (readyQueue.length === 0) {
+                    const next = queue.find(p => !arrived.has(p.id));
+                    currentTime = next.arrivalTime;
+                    for (const p of queue) {
+                        if (!arrived.has(p.id) && p.arrivalTime <= currentTime) {
+                            readyQueue.push(p);
+                            arrived.add(p.id);
+                        }
+                    }
+                }
 
-    <script src="js/metrics/metrics.js"></script>
+                const current = readyQueue.shift();
+                const start = currentTime;
+                const runTime = Math.min(timeQuantum, current.remainingTime);
+                current.remainingTime -= runTime;
+                currentTime += runTime;
 
-    <script src="js/main.js"></script>
+                executionTrace.push(new ExecutionTrace(current.id, start, currentTime));
 
+                for (const p of queue) {
+                    if (!arrived.has(p.id) && p.arrivalTime <= currentTime) {
+                        readyQueue.push(p);
+                        arrived.add(p.id);
+                    }
+                }
+
+                if (current.remainingTime > 0) {
+                    readyQueue.push(current);
+                }
+            }
+            return executionTrace;
+        }
+
+        function priorityScheduling(processes) {
+            const queue = processes.map(p => ({ ...p, remainingTime: p.burstTime }));
+            const executionTrace = [];
+            let currentTime = 0;
+            let readyQueue = [];
+            let arrived = new Set();
+
+            queue.sort((a, b) => a.arrivalTime - b.arrivalTime);
+
+            for (const p of queue) {
+                if (p.arrivalTime <= currentTime) {
+                    readyQueue.push(p);
+                    arrived.add(p.id);
+                }
+            }
+
+            while (readyQueue.length > 0 || queue.some(p => !arrived.has(p.id))) {
+                if (readyQueue.length === 0) {
+                    const next = queue.find(p => !arrived.has(p.id));
+                    currentTime = next.arrivalTime;
+                    for (const p of queue) {
+                        if (!arrived.has(p.id) && p.arrivalTime <= currentTime) {
+                            readyQueue.push(p);
+                            arrived.add(p.id);
+                        }
+                    }
+                }
+
+                readyQueue.sort((a, b) => a.priority === b.priority ? a.arrivalTime - b.arrivalTime : a.priority - b.priority);
+
+                const current = readyQueue.shift();
+                const start = currentTime;
+                current.remainingTime = 0;
+                currentTime += current.burstTime;
+
+                executionTrace.push(new ExecutionTrace(current.id, start, currentTime));
+
+                for (const p of queue) {
+                    if (!arrived.has(p.id) && p.arrivalTime <= currentTime) {
+                        readyQueue.push(p);
+                        arrived.add(p.id);
+                    }
+                }
+            }
+            return executionTrace;
+        }
+
+        function calculateMetrics(executionTraces, processes) {
+            const processStats = {};
+            processes.forEach(p => {
+                processStats[p.id] = { arrivalTime: p.arrivalTime, burstTime: p.burstTime, firstStart: null, lastFinish: null };
+            });
+
+            executionTraces.forEach(trace => {
+                const stats = processStats[trace.processId];
+                if (!stats) return;
+                if (stats.firstStart === null || trace.start < stats.firstStart) stats.firstStart = trace.start;
+                if (stats.lastFinish === null || trace.finish > stats.lastFinish) stats.lastFinish = trace.finish;
+            });
+
+            let totalTAT = 0, totalWT = 0, totalRT = 0;
+            const numProcesses = processes.length;
+
+            Object.values(processStats).forEach(stats => {
+                const tat = stats.lastFinish - stats.arrivalTime;
+                const wt = tat - stats.burstTime;
+                const rt = stats.firstStart - stats.arrivalTime;
+                totalTAT += tat; totalWT += wt; totalRT += rt;
+            });
+
+            return [(totalTAT / numProcesses).toFixed(2), (totalWT / numProcesses).toFixed(2), (totalRT / numProcesses).toFixed(2)];
+        }
+
+        function drawGanttChart(traces, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = "";
+            if (!traces || traces.length === 0) return;
+
+            const ganttBar = document.createElement("div");
+            ganttBar.className = "gantt-bar";
+            const timeline = document.createElement("div");
+            timeline.className = "timeline";
+            const scale = 30;
+
+            traces.forEach((trace, index) => {
+                const duration = trace.finish - trace.start;
+                
+                const segment = document.createElement("div");
+                segment.className = "segment";
+                segment.style.width = (duration * scale) + "px";
+                segment.textContent = trace.processId;
+                ganttBar.appendChild(segment);
+
+                const tick = document.createElement("div");
+                tick.className = "tick";
+                tick.style.width = (duration * scale) + "px";
+                tick.textContent = trace.start;
+                timeline.appendChild(tick);
+
+                if (index === traces.length - 1) {
+                    const lastTick = document.createElement("div");
+                    lastTick.className = "tick";
+                    lastTick.textContent = trace.finish;
+                    timeline.appendChild(lastTick);
+                }
+            });
+            container.appendChild(ganttBar);
+            container.appendChild(timeline);
+        }
+
+        let processes = [];
+        let processCount = 1;
+
+        document.getElementById("process-id").value = `P${processCount}`;
+
+        document.getElementById("add-process-btn").addEventListener("click", () => {
+            const idInput = document.getElementById("process-id");
+            const arrInput = document.getElementById("arrival-time");
+            const burstInput = document.getElementById("burst-time");
+            const prioInput = document.getElementById("priority-val");
+
+            const pId = idInput.value || `P${processCount}`;
+            const pArr = parseInt(arrInput.value) || 0;
+            const pBurst = parseInt(burstInput.value) || 1;
+            const pPrio = parseInt(prioInput.value) || 1;
+
+            processes.push({ id: pId, arrivalTime: pArr, burstTime: pBurst, priority: pPrio });
+
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${pId}</td><td>${pArr}</td><td>${pBurst}</td><td>${pPrio}</td>`;
+            document.getElementById("process-container").appendChild(row);
+
+            processCount++;
+            idInput.value = `P${processCount}`;
+            arrInput.value = ""; burstInput.value = ""; prioInput.value = "";
+        });
+
+        document.getElementById("run-btn").addEventListener("click", () => {
+            if (processes.length === 0) return alert("ضيف Process الأول!");
+
+            const tq = parseInt(document.getElementById("time-quantum").value) || 2;
+
+            const rrTraces = roundRobin([...processes], tq);
+            const rrMetrics = calculateMetrics(rrTraces, processes);
+            document.getElementById("rr-metrics-row").innerHTML = `<td>${rrMetrics[0]}</td><td>${rrMetrics[1]}</td><td>${rrMetrics[2]}</td>`;
+            drawGanttChart(rrTraces, "rr-gantt");
+
+           
+            const prioTraces = priorityScheduling([...processes]);
+            const prioMetrics = calculateMetrics(prioTraces, processes);
+            document.getElementById("prio-metrics-row").innerHTML = `<td>${prioMetrics[0]}</td><td>${prioMetrics[1]}</td><td>${prioMetrics[2]}</td>`;
+            drawGanttChart(prioTraces, "priority-gantt");
+        });
+    </script>
 </body>
-
 </html>
