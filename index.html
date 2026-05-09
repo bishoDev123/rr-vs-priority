@@ -518,7 +518,9 @@
         document.getElementById("run-btn").addEventListener("click", () => {
             if (processes.length === 0) return alert("ضيف Process الأول!");
 
-            const tq = parseInt(document.getElementById("time-quantum").value) || 2;
+            const tq = parseInt(document.getElementById("time-quantum").value);
+
+            if (tq === 0) return alert("time quantum is not valid");
 
             const rrTraces = roundRobin([...processes], tq);
             const rrMetrics = calculateMetrics(rrTraces, processes);
