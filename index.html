@@ -1,40 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CPU Scheduling Simulator</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; line-height: 1.6; background-color: #f4f4f9; }
-        #input-panel { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .controls { margin-bottom: 15px; }
-        input { padding: 8px; margin-right: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 8px 15px; cursor: pointer; border-radius: 4px; border: none; background: #ddd; margin-right: 5px; margin-bottom: 5px; transition: 0.2s;}
-        button:hover { opacity: 0.8; }
-        button.primary { background: #007bff; color: white; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; background: white;}
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
-        .gantt-container { margin: 20px 0; overflow-x: auto; background: white; padding: 15px; border-radius: 5px; }
-        .gantt-bar { display: flex; border: 2px solid #333; height: 40px; width: max-content; }
-        .segment { border-right: 1px solid white; background-color: #4a90e2; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; box-sizing: border-box; }
-        .timeline { display: flex; width: max-content; }
-        .tick { text-align: left; font-size: 12px; color: #666; padding-top: 5px; box-sizing: border-box; }
-        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f4f4f9;
+        }
+
+        #input-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            margin-bottom: 15px;
+        }
+
+        input {
+            padding: 8px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            border: none;
+            background: #ddd;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        button.primary {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            background: white;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .gantt-container {
+            margin: 20px 0;
+            overflow-x: auto;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .gantt-bar {
+            display: flex;
+            border: 2px solid #333;
+            height: 40px;
+            width: max-content;
+        }
+
+        .segment {
+            border-right: 1px solid white;
+            background-color: #4a90e2;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+
+        .timeline {
+            display: flex;
+            width: max-content;
+        }
+
+        .tick {
+            text-align: left;
+            font-size: 12px;
+            color: #666;
+            padding-top: 5px;
+            box-sizing: border-box;
+        }
+
         /* تنسيق قسم الأمثلة الجاهزة */
-        .examples-section { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #ccc; }
-        .btn-rr { background: #17a2b8; color: white; font-weight: bold; }
-        .btn-prio { background: #ffc107; color: black; font-weight: bold; }
-        .btn-equal { background: #6c757d; color: white; font-weight: bold; }
-        .btn-clear { background: #dc3545; color: white; font-weight: bold; float: right; }
+        .examples-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed #ccc;
+        }
+
+        .btn-rr {
+            background: #17a2b8;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-prio {
+            background: #ffc107;
+            color: black;
+            font-weight: bold;
+        }
+
+        .btn-equal {
+            background: #6c757d;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-clear {
+            background: #dc3545;
+            color: white;
+            font-weight: bold;
+            float: right;
+        }
     </style>
 </head>
+
 <body>
 
     <h1>CPU Scheduling Comparison</h1>
 
     <section id="input-panel">
         <h2>Input Panel</h2>
-        
+
         <div class="controls">
             <label for="time-quantum"><strong>Time Quantum (RR): </strong></label>
             <input id="time-quantum" type="number" min="1" value="2">
@@ -63,11 +176,12 @@
         </table>
 
         <div class="controls">
-            <button id="run-btn" class="primary" style="background: #28a745; width: 100%; font-size: 16px;">Run Simulation</button>
+            <button id="run-btn" class="primary" style="background: #28a745; width: 100%; font-size: 16px;">Run
+                Simulation</button>
         </div>
 
         <div class="examples-section">
-            <h3>أمثلة تلقائية (Auto Examples)</h3>
+            <h3>pre-made examples</h3>
             <button id="ex-rr-better" class="btn-rr">Round Robin higher </button>
             <button id="ex-prio-better" class="btn-prio">Priority higher </button>
             <button id="ex-equal" class="btn-equal">both equal</button>
@@ -86,7 +200,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr id="rr-metrics-row"><td>-</td><td>-</td><td>-</td></tr>
+                <tr id="rr-metrics-row">
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
             </tbody>
         </table>
     </section>
@@ -103,11 +221,48 @@
                 </tr>
             </thead>
             <tbody>
-                <tr id="prio-metrics-row"><td>-</td><td>-</td><td>-</td></tr>
+                <tr id="prio-metrics-row">
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
             </tbody>
         </table>
     </section>
+    <section>
+        <h2>Algorithm Comparison</h2>
 
+        <div id="comparison-box"
+            style="background:white; padding:15px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+            <p><strong>Best Algorithm:</strong> <span id="best-algo">-</span></p>
+            <p><strong>Reason:</strong> <span id="comparison-reason">-</span></p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Avg Turnaround</th>
+                        <th>Avg Waiting</th>
+                        <th>Avg Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Round Robin</td>
+                        <td id="rr-tat">-</td>
+                        <td id="rr-wt">-</td>
+                        <td id="rr-rt">-</td>
+                    </tr>
+                    <tr>
+                        <td>Priority</td>
+                        <td id="pr-tat">-</td>
+                        <td id="pr-wt">-</td>
+                        <td id="pr-rt">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
     <script>
         // --- 1. Models ---
         class ExecutionTrace {
@@ -255,7 +410,7 @@
 
             traces.forEach((trace, index) => {
                 const duration = trace.finish - trace.start;
-                
+
                 const segment = document.createElement("div");
                 segment.className = "segment";
                 segment.style.width = (duration * scale) + "px";
@@ -334,7 +489,7 @@
                 addProcessToTable("P3", 0, 2, 3);
                 addProcessToTable("P4", 0, 2, 4);
                 processCount = 5;
-            } 
+            }
             else if (exampleType === 'prio-better') {
                 // حالة الـ Priority تتفوق: الأولوية تعطي ميزة للعمليات الأقصر (مثل SJF)
                 document.getElementById("time-quantum").value = 2;
@@ -342,7 +497,7 @@
                 addProcessToTable("P2", 0, 4, 2);
                 addProcessToTable("P3", 0, 8, 3);
                 processCount = 4;
-            } 
+            }
             else if (exampleType === 'equal') {
                 // حالة التعادل: كل العمليات وقتها صغير ويساوي الـ Quantum والأولويات بالترتيب
                 document.getElementById("time-quantum").value = 2;
@@ -351,7 +506,7 @@
                 addProcessToTable("P3", 0, 2, 3);
                 processCount = 4;
             }
-            
+
             document.getElementById("process-id").value = `P${processCount}`;
             document.getElementById("run-btn").click(); // تشغيل المحاكاة فوراً
         }
@@ -374,7 +529,41 @@
             const prioMetrics = calculateMetrics(prioTraces, processes);
             document.getElementById("prio-metrics-row").innerHTML = `<td>${prioMetrics[0]}</td><td>${prioMetrics[1]}</td><td>${prioMetrics[2]}</td>`;
             drawGanttChart(prioTraces, "priority-gantt");
+            // Fill comparison table
+            document.getElementById("rr-tat").textContent = rrMetrics[0];
+            document.getElementById("rr-wt").textContent = rrMetrics[1];
+            document.getElementById("rr-rt").textContent = rrMetrics[2];
+
+            document.getElementById("pr-tat").textContent = prioMetrics[0];
+            document.getElementById("pr-wt").textContent = prioMetrics[1];
+            document.getElementById("pr-rt").textContent = prioMetrics[2];
+
+            // Simple scoring system (lower is better)
+            function score(metrics) {
+                return parseFloat(metrics[0]) + parseFloat(metrics[1]) + parseFloat(metrics[2]);
+            }
+
+            const rrScore = score(rrMetrics);
+            const prioScore = score(prioMetrics);
+
+            let best = "";
+            let reason = "";
+
+            if (rrScore < prioScore) {
+                best = "Round Robin";
+                reason = "Lower overall average of Turnaround, Waiting, and Response time.";
+            } else if (prioScore < rrScore) {
+                best = "Priority Scheduling";
+                reason = "Lower overall average of Turnaround, Waiting, and Response time.";
+            } else {
+                best = "Equal Performance";
+                reason = "Both algorithms produced identical average metrics.";
+            }
+
+            document.getElementById("best-algo").textContent = best;
+            document.getElementById("comparison-reason").textContent = reason;
         });
     </script>
 </body>
+
 </html>
