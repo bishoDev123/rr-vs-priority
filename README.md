@@ -70,19 +70,19 @@
 #### Screenshots
 Input Panel
 
-![Input Panel](assets/inputpanel.png)
+![Input Panel](images/inputpanel.png)
 
 Round Robin Gantt Chart
 
-![RR Output](assets/rr.png)
+![RR Output](images/rr.png)
 
 Priority Scheduling Gantt Chart
 
-![Priority Output](assets/priority.png)
+![Priority Output](images/priority.png)
 
 Comparison Result
 
-![Comparison](assets/comparison.png)
+![Comparison](images/comparison.png)
 
 Example Output Interpretation
 If Round Robin performs better:
