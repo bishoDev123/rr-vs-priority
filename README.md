@@ -84,16 +84,3 @@ Comparison Result
 
 ![Comparison](images/comparison.png)
 
-Example Output Interpretation
-If Round Robin performs better:
-Workloads are likely balanced and fairness improves responsiveness
-If Priority Scheduling performs better:
-System favors short or high-priority tasks
-If equal:
-Both algorithms perform similarly under given workload distribution
-Technical Notes
-Implemented using Vanilla JavaScript (ES6)
-No external libraries used
-DOM-based dynamic rendering for Gantt charts
-Metric calculations derived from execution trace logs
-Modular function-based architecture for scheduling logic
