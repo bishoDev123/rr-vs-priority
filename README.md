@@ -31,6 +31,19 @@
 - Lower numerical value = higher priority
 - Once a process starts, it runs until completion
 - Comparison Logic
+
+#### 3.Comparison
+
+| Aspect                           | Round Robin (RR)                                                                                                                   | Priority Scheduling (Non-preemptive)                                                                                                          |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Fairness**                     | High fairness because each process receives equal CPU time through fixed time slices. No single process can monopolize the CPU.    | Lower fairness because CPU allocation depends entirely on priority values. Low-priority processes may wait significantly longer.              |
+| **Urgency Handling**             | Handles all processes equally, regardless of urgency or importance. Critical tasks are not prioritized.                            | Excellent for urgent or critical tasks since higher-priority processes execute first. Suitable for real-time or priority-sensitive workloads. |
+| **Starvation Risk**              | Very low starvation risk because all ready processes eventually receive CPU time.                                                  | High starvation risk for low-priority processes if higher-priority tasks continue arriving.                                                   |
+| **Aggregation / System Balance** | Provides balanced resource distribution and smoother overall responsiveness across processes. Works well for time-sharing systems. | Optimizes execution for important tasks but may create imbalance by heavily favoring high-priority processes.                                 |
+| **Response Time**                | Typically better response time for interactive systems because processes receive CPU access quickly.                               | Response time depends on priority level; high-priority tasks respond quickly while lower-priority tasks may experience delays.                |
+| **CPU Utilization Behavior**     | Frequent context switching can increase overhead in real operating systems.                                                        | Lower switching overhead because processes run until completion once selected.                                                                |
+| **Best Use Case**                | Multi-user or interactive systems where fairness and responsiveness are important.                                                 | Systems requiring urgent task execution or differentiated process importance.                                                                 |
+
 ---
 #### The system evaluates both algorithms using a simple scoring method:
 

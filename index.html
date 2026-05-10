@@ -107,7 +107,7 @@
             box-sizing: border-box;
         }
 
-        /* تنسيق قسم الأمثلة الجاهزة */
+    
         .examples-section {
             margin-top: 20px;
             padding-top: 15px;
@@ -264,7 +264,7 @@
         </div>
     </section>
     <script>
-        // --- 1. Models ---
+        
         class ExecutionTrace {
             constructor(processId, start, finish) {
                 this.processId = processId;
@@ -273,7 +273,7 @@
             }
         }
 
-        // --- 2. Round Robin Logic ---
+        
         function roundRobin(processes, timeQuantum) {
             const queue = processes.map(p => ({ ...p, remainingTime: p.burstTime }));
             const executionTrace = [];
@@ -439,7 +439,7 @@
 
         document.getElementById("process-id").value = `P${processCount}`;
 
-        // وظيفة لإضافة بروسيس للجدول
+
         function addProcessToTable(pId, pArr, pBurst, pPrio) {
             processes.push({ id: pId, arrivalTime: pArr, burstTime: pBurst, priority: pPrio });
             const row = document.createElement("tr");
@@ -465,7 +465,7 @@
             arrInput.value = ""; burstInput.value = ""; prioInput.value = "";
         });
 
-        // مسح كل البيانات
+        
         document.getElementById("clear-btn").addEventListener("click", () => {
             processes = [];
             processCount = 1;
@@ -477,12 +477,11 @@
             document.getElementById("prio-metrics-row").innerHTML = "<td>-</td><td>-</td><td>-</td>";
         });
 
-        // الأمثلة الجاهزة
+        
         function loadExample(exampleType) {
-            document.getElementById("clear-btn").click(); // مسح قبل التحميل
+            document.getElementById("clear-btn").click();
 
             if (exampleType === 'rr-better') {
-                // حالة الـ RR يتفوق: عملية طويلة جداً بأولوية عالية، وعمليات قصيرة بأولوية منخفضة
                 document.getElementById("time-quantum").value = 2;
                 addProcessToTable("P1", 0, 10, 1);
                 addProcessToTable("P2", 0, 2, 2);
@@ -491,7 +490,6 @@
                 processCount = 5;
             }
             else if (exampleType === 'prio-better') {
-                // حالة الـ Priority تتفوق: الأولوية تعطي ميزة للعمليات الأقصر (مثل SJF)
                 document.getElementById("time-quantum").value = 2;
                 addProcessToTable("P1", 0, 2, 1);
                 addProcessToTable("P2", 0, 4, 2);
@@ -499,7 +497,6 @@
                 processCount = 4;
             }
             else if (exampleType === 'equal') {
-                // حالة التعادل: كل العمليات وقتها صغير ويساوي الـ Quantum والأولويات بالترتيب
                 document.getElementById("time-quantum").value = 2;
                 addProcessToTable("P1", 0, 2, 1);
                 addProcessToTable("P2", 0, 2, 2);
@@ -508,7 +505,7 @@
             }
 
             document.getElementById("process-id").value = `P${processCount}`;
-            document.getElementById("run-btn").click(); // تشغيل المحاكاة فوراً
+            document.getElementById("run-btn").click();
         }
 
         document.getElementById("ex-rr-better").addEventListener("click", () => loadExample('rr-better'));
@@ -516,7 +513,7 @@
         document.getElementById("ex-equal").addEventListener("click", () => loadExample('equal'));
 
         document.getElementById("run-btn").addEventListener("click", () => {
-            if (processes.length === 0) return alert("ضيف Process الأول!");
+            if (processes.length === 0) return alert("No processes added");
 
             const tq = parseInt(document.getElementById("time-quantum").value);
 
@@ -531,7 +528,7 @@
             const prioMetrics = calculateMetrics(prioTraces, processes);
             document.getElementById("prio-metrics-row").innerHTML = `<td>${prioMetrics[0]}</td><td>${prioMetrics[1]}</td><td>${prioMetrics[2]}</td>`;
             drawGanttChart(prioTraces, "priority-gantt");
-            // Fill comparison table
+        
             document.getElementById("rr-tat").textContent = rrMetrics[0];
             document.getElementById("rr-wt").textContent = rrMetrics[1];
             document.getElementById("rr-rt").textContent = rrMetrics[2];
@@ -540,7 +537,6 @@
             document.getElementById("pr-wt").textContent = prioMetrics[1];
             document.getElementById("pr-rt").textContent = prioMetrics[2];
 
-            // Simple scoring system (lower is better)
             function score(metrics) {
                 return parseFloat(metrics[0]) + parseFloat(metrics[1]) + parseFloat(metrics[2]);
             }
